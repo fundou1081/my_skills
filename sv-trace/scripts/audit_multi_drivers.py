@@ -52,7 +52,11 @@ def main():
     # filter by min-drivers
     multi = {sig: ds for sig, ds in multi.items() if len(ds) >= args.min_drivers}
 
+    # dump_multi_drivers(summary_only=True) 返回 {summary: {...}} 嵌套结构
     summary = t.dump_multi_drivers(summary_only=True)
+    # 展平: 拿内层 summary
+    if isinstance(summary, dict) and "summary" in summary and isinstance(summary["summary"], dict):
+        summary = summary["summary"]
 
     output = {
         "scanned_dir": str(args.dir),
