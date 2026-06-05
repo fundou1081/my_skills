@@ -11,6 +11,7 @@ WorkBuddy Agent Skills 集合，统一版本管理。
 | [report-maker](report-maker/) | v1.0.0 | 专业报告制作 |
 | [triz](triz/) | v1.0.0 | TRIZ 发明问题解决理论 |
 | [first-principles](first-principles/) | v1.0.0 | 第一性原理思维 |
+| [better-act-skill](better-act-skill/) | v1.0.0 | 元提示词框架引导, 5 框架内置 (TIDD-EC/ICDO/CRISPE/BROKE/CO-STAR) |
 
 ## 同步规则
 
