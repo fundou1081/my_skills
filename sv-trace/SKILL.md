@@ -1,9 +1,9 @@
 ---
 name: sv-trace
-description: SystemVerilog 信号追踪器 — 给一个信号名, 返回该信号在 RTL 源码中所有的 driver (驱动) 和 load (负载), 含文件位置、scope 源码、时钟/复位、条件栈、层次路径、跨模块端口连接。每个 trace 都带**可证伪的代码证据链 (M5.1)**： 读回实际文件验证 source_expr/signal_name 真在该行, 输出 credibility_score (0-1) 和 is_verified 标记 — 让 LLM 和人能反查、决定要不要信。基于 pyslang 语义层分析, 支持多文件项目、Interface/Modport、跨模块层次路径、Streaming concat / StructuredAssignmentPattern / `inside` 等高级 SV 特性, 已验证 OpenTitan 30,218 drivers 0 warning。Use when (1) 用户给出 SV 代码片段, 问“这个信号被谁驱动 / 谁在读这个信号, (2) 调试 RTL 时需要查信号在哪个 always 块里被赋值, (3) 自动生成 driver/load 列表喂给 LLM 做代码理解, (4) 在大型 SV 项目 (OpenTitan 等) 中跨模块追踪信号, (5) 检测多驱动冲突 (always_ff 多次写同一信号) 并附证据, (6) 递归查 driver 链 / load 链, 链上每跳都带 evidence, (7) 验证 LLM 写的 SV 行为对不对 (credibility_score 量化), (8) 一次 dump 整个链为 JSON 喂 LLM (含 summary)。不要用 sv-trace 做 CDC / 面积功耗 / Lint / FSM 提取 / 约束分析 / 覆盖率建议 — 那些不在本项目范围。
+description: SystemVerilog 信号追踪器 — 给一个信号名, 返回该信号在 RTL 源码中所有的 driver (驱动) 和 load (负载), 含文件位置、scope 源码、时钟/复位、条件栈、层次路径、跨模块端口连接。每个 trace 都带**可证伪的代码证据链 (M5.1)**： 读回实际文件验证 source_expr/signal_name 真在该行, 输出 credibility_score (0-1) 和 is_verified 标记 — 让 LLM 和人能反查、决定要不要信。M5.1j 加人类友好箭头式输出 (←/→/⚠/✓/✗/⤴/↻) — 一键 `to_arrow()` 让数据流在终端/聊天一眼看懂。基于 pyslang 语义层分析, 支持多文件项目、Interface/Modport、跨模块层次路径、Streaming concat / StructuredAssignmentPattern / `inside` 等高级 SV 特性, 已验证 OpenTitan 30,218 drivers 0 warning。Use when (1) 用户给出 SV 代码片段, 问“这个信号被谁驱动 / 谁在读这个信号, (2) 调试 RTL 时需要查信号在哪个 always 块里被赋值, (3) 自动生成 driver/load 列表喂给 LLM 做代码理解, (4) 在大型 SV 项目 (OpenTitan 等) 中跨模块追踪信号, (5) 检测多驱动冲突 (always_ff 多次写同一信号) 并附证据, (6) 递归查 driver 链 / load 链, 链上每跳都带 evidence, (7) 验证 LLM 写的 SV 行为对不对 (credibility_score 量化), (8) 一次 dump 整个链为 JSON 喂 LLM (含 summary), (9) 要“人在聊天里一眼能看”的数据流箭头输出 (←/→/⚠/✓)。不要用 sv-trace 做 CDC / 面积功耗 / Lint / FSM 提取 / 约束分析 / 覆盖率建议 — 那些不在本项目范围。
 ---
 
-# sv-trace — SystemVerilog Signal Tracer
+# sv-trace - SystemVerilog Signal Tracer
 
 给一个 SystemVerilog 信号名, 找出它所有的 driver / load, 加完整上下文 + 证据链, 喂给 LLM 或人用。
 
@@ -99,17 +99,17 @@ r2 = t.trace('dout')
 
 ## Core API (按场景分组)
 
-### 1. 单文件 / 一次性 — `trace_signal()`
+### 1. 单文件 / 一次性 - `trace_signal()`
 
 ```python
 from signal_tracer import trace_signal
 
 result = trace_signal("sig", sv_code, "test.sv")
-# result.drivers: List[TraceResult] — 所有 driver
-# result.loads:   List[TraceResult] — 所有 load
+# result.drivers: List[TraceResult] - 所有 driver
+# result.loads:   List[TraceResult] - 所有 load
 ```
 
-### 2. 多文件 / 跨模块 — `SignalTracer`
+### 2. 多文件 / 跨模块 - `SignalTracer`
 
 ```python
 from signal_tracer import SignalTracer
@@ -154,7 +154,7 @@ load_chain = t.get_load_chain('reg2hw', max_depth=10)
 # 不要 evidence: t.get_driver_chain('data_out', verify=False)
 ```
 
-### 5. 一次 dump 整个链 (M5.1f) — LLM 友好
+### 5. 一次 dump 整个链 (M5.1f) - LLM 友好
 
 ```python
 dump = t.dump_driver_chain('tx_enable')  # 默认含 hops + context_window
@@ -166,7 +166,7 @@ summary_only = t.dump_driver_chain('tx_enable', summary_only=True)
 load_dump = t.dump_load_chain('reg2hw')  # 下游链同样可 dump
 ```
 
-### 6. 多驱动 dump (M5.1g) — 一次 dump 全部冲突
+### 6. 多驱动 dump (M5.1g) - 一次 dump 全部冲突
 
 ```python
 multi_dump = t.dump_multi_drivers()
@@ -176,7 +176,7 @@ multi_dump = t.dump_multi_drivers()
 print(json.dumps(multi_dump, indent=2))
 ```
 
-### 7. 代码证据链 (M5.1) — 让 trace 自证
+### 7. 代码证据链 (M5.1) - 让 trace 自证
 
 **核心问题**: trace 之前只是元数据, "信不信由你"。M5.1 让每个 trace 都能"自证"。
 
@@ -206,10 +206,10 @@ Evidence for always_ff @(posedge clk ...) @ counter.sv:9
 ```
 
 **可信度评分** (0-1):
-- `file_readable` (+0.2) — 文件能读
-- `snippet_present` (+0.2) — line 存在
-- `matches_source_expr` (+0.4) — 文本里真找到 source_expr
-- `matches_signal_name` (+0.2) — 文本里真找到 signal_name
+- `file_readable` (+0.2) - 文件能读
+- `snippet_present` (+0.2) - line 存在
+- `matches_source_expr` (+0.4) - 文本里真找到 source_expr
+- `matches_signal_name` (+0.2) - 文本里真找到 signal_name
 
 **多文件项目**: 用 `trace_verified()` 自动用 in-memory 内容填充 evidence (避免磁盘 I/O):
 ```python
@@ -220,7 +220,7 @@ t.build()
 result = t.trace_verified('top.u_sub.signal')  # 自动用 self._files 填充
 ```
 
-### 8. ContextBundle (M2) — 打包给 LLM
+### 8. ContextBundle (M2) - 打包给 LLM
 
 ```python
 result = trace_signal("count", sv_code, "counter.sv")
@@ -253,6 +253,152 @@ loads = t.trace_loads('reg2hw')         # 默认 verify=True
 | `clock` / `reset` | str | 提取的时钟/复位信号 (M1.5) |
 | `condition_stack` | List[str] | 嵌套条件栈 (如 `['!rst_n', 'data_in[7]']`) |
 | `hierarchical_path` | str | 模块实例路径 (如 `'top.u_mid'`) |
+
+---
+
+## 人类友好箭头式输出 (M5.1j)
+
+所有 trace 都能用箭头式表达数据流向 - 人眼在终端/文档/聊天里一眼看懂谁驱动谁、谁被读。
+
+### 箭头语义 (固定)
+
+| 符号 | 含义 |
+|------|------|
+| `←` | driver (信号被这个表达式驱动) |
+| `→` | load (信号被这个表达式读取) |
+| `⚠` | 多驱动冲突 |
+| `✓` | verified (credibility >= 0.8) |
+| `✗` | not verified (credibility < 0.8) |
+| `⤴` | cross-file 跨文件 |
+| `↻` | cycle detected |
+
+### 5 个 API 层级
+
+```python
+from signal_tracer import trace_signal, SignalTracer
+
+# 1. TraceSummary - 一键全部 drivers+loads
+result = trace_signal("count", sv, "counter.sv")
+print(result.to_arrow())
+# DRIVERS (2):
+#   count ← 8'h00 @ counter.sv:9 [counter] ✓ cred=1.00
+#   count ← count + data_in @ counter.sv:10 [counter] ✓ cred=1.00
+# LOADS (0):
+#   (none)
+
+# 2. 单条 TraceResult
+for d in result.drivers:
+    print(d.to_arrow())
+# count ← 8'h00 @ counter.sv:9 [counter] ✓ cred=1.00
+
+# 3. SignalTracer - 一键多驱动
+t = SignalTracer()
+t.add_file("buggy.sv", multi_sv); t.build()
+print(t.multi_drivers_to_arrow())
+# data ⚠ 2 drivers:
+#   data ← 8'hAA @ buggy.sv:9 [buggy] ✓ cred=1.00
+#   data ← 8'h55 @ buggy.sv:12 [buggy] ✓ cred=1.00
+
+# 4. 链追踪
+print(t.chain_to_arrow("data_out", direction="driver"))
+# data_out ← c ⤴ ← b ← a
+
+# 5. dump 转箭头
+print(t.dump_to_arrow("data_out"))
+# Chain data_out: 4 hops, avg_cred=0.95, cross-file ✓, cycle ✗
+#   data_out ← c ✓ ← b ✓ ← a ✓
+```
+
+### 直接用 formatter 函数 (低层级)
+
+```python
+from signal_tracer import (
+    format_driver, format_load, format_all,
+    ARROW_DRIVER, ARROW_LOAD,
+)
+
+print(format_driver(result.drivers[0]))
+print(ARROW_DRIVER)  # '←'
+print(ARROW_LOAD)    # '→'
+```
+
+### 与 `summary()` 区别
+
+| 方法 | 适合 |
+|------|------|
+| `summary()` | 短/字段化/适合 LLM 当 context |
+| `to_arrow()` | 箭头/数据流/适合人眼扫/聊天贴出来 |
+
+### Tree / Vertical / ASCII 风格 (M5.1k) — 长链/文档/聊天友好
+
+长链 (≥ 4 信号) 一行太长, 贴文档/聊天也不好读。换成 tree/vertical 风格:
+
+```python
+t = SignalTracer()
+t.add_file('top.sv', top_code)
+t.add_file('mid.sv', mid_code)
+t.add_file('leaf.sv', leaf_code)
+t.build()
+```
+
+**5 种风格可选**:
+
+```python
+# 1. arrow (默认): 一行
+t.chain_to_arrow('top.u_mid.u_leaf_a.out_data')
+# out_data ← out_data ← mid_data  (↻ cycle detected)
+
+# 2. tree: tree 风格, Unicode box-drawing
+t.chain_to_arrow('top.u_mid.u_leaf_a.out_data', style='tree')
+# Driver chain: top.u_mid.u_leaf_a.out_data (3 hops, ↻ cycle)
+#   ├─ out_data  [leaf.sv:11]  ✓ cred=1.00
+#   │  ← out_data  [leaf.sv:12]  ✓ cred=1.00
+#   └─ ← mid_data  [leaf.sv:9]  ✓ cred=1.00
+
+# 3. ascii: 同 tree 但 ASCII
+t.chain_to_arrow('top.u_mid.u_leaf_a.out_data', style='ascii')
+# Driver chain: top.u_mid.u_leaf_a.out_data (3 hops, ↻ cycle)
+#   +-- out_data  [leaf.sv:11]  ✓ cred=1.00
+#   |  ← out_data  [leaf.sv:12]  ✓ cred=1.00
+#   +-- ← mid_data  [leaf.sv:9]  ✓ cred=1.00
+
+# 4. vertical: 每行一个信号, 缩进表示深度
+t.chain_to_arrow('top.u_mid.u_leaf_a.out_data', style='vertical')
+# out_data @ leaf.sv:11 ✓ cred=1.00
+#   ← out_data @ leaf.sv:12 ✓ cred=1.00
+#     ← mid_data @ leaf.sv:9 ✓ cred=1.00
+
+# 5. all: arrow + tree 都给
+t.chain_to_arrow('top.u_mid.u_leaf_a.out_data', style='all')
+```
+
+**Alias 方法 (短写)**:
+
+```python
+t.chain_to_tree(signal, use_box=True)   # tree style
+t.chain_to_tree(signal, use_box=False)  # ascii style
+t.chain_to_vertical(signal)             # vertical
+t.dump_to_tree(signal, use_box=True)    # dump + tree
+t.dump_to_tree(signal, use_box=False)   # dump + ascii
+```
+
+**dump_to_arrow 也支持**:
+
+```python
+t.dump_to_arrow(signal, style='arrow')    # 默认 1 行
+t.dump_to_arrow(signal, style='tree')     # tree
+t.dump_to_arrow(signal, style='vertical') # vertical
+t.dump_to_arrow(signal, style='ascii')    # ASCII
+```
+
+**怎么选**:
+- 短链 (≤ 3): `arrow` (默认) — 一行就够
+- 中链 (4-7) + 看代码: `tree` — 节点 + location + cred 一起看
+- 中链 + 贴 chat/markdown: `vertical` — 不依赖 box-drawing
+- 老终端 / 邮件 / 纯文本 log: `ascii` — 不需要 Unicode
+- 要全面: `all` — arrow + tree 都给
+
+`format_driver_chain(style=...)` / `format_dump_summary(style=...)` 也都接受 style 参数。
 
 ---
 
@@ -338,7 +484,7 @@ summary = t.dump_multi_drivers(summary_only=True)
 
 - **modport direction** (input/output) 区分 driver/load 尚未实现 (现在都被当 driver)
 - **不支持**: virtual interface / Clocking block / Property-Sequence 内部 / System task ($cast, $readmemh) 中的信号
-- **evidence `matches_source_expr`** 是**字面量**子串匹配 — pyslang 文本格式
+- **evidence `matches_source_expr`** 是**字面量**子串匹配 - pyslang 文本格式
   (如 `count Add data_in`) 与源码 (`count + data_in`) 不完全一致时, 命中率会降。
   反映在 credibility_score 上, **不会静默接受**。
 
@@ -375,30 +521,30 @@ summary = t.dump_multi_drivers(summary_only=True)
 
 ## 不要做的事
 
-❌ **不要**把 sv-trace 当 lint 工具用 — 它不报 warning, 只 trace
-❌ **不要**对同一信号名跑跨不相关模块 — 层次路径要写全
-❌ **不要**expect modport direction 区分 — 目前 modport input/output 都被当 driver
+❌ **不要**把 sv-trace 当 lint 工具用 - 它不报 warning, 只 trace
+❌ **不要**对同一信号名跑跨不相关模块 - 层次路径要写全
+❌ **不要**expect modport direction 区分 - 目前 modport input/output 都被当 driver
 ❌ **不要**用于 HDL 之外的代码 (Verilog/VHDL 也行但 SV 优化)
-❌ **不要**循环 import 多次 build 同一个 tracer — 缓存即可
+❌ **不要**循环 import 多次 build 同一个 tracer - 缓存即可
 
 ---
 
 ## References (按需加载)
 
-- `references/api_reference.md` — 完整 API 签名 + 所有 dataclass 字段
-- `references/evidence_guide.md` — credibility_score 算法 + 何时信 / 不信
-- `references/opentitan_examples.md` — OpenTitan 6 模块的 driver dump 实例
-- `references/limitations.md` — 已知不支持的 SV 特性 + 失败模式
+- `references/api_reference.md` - 完整 API 签名 + 所有 dataclass 字段
+- `references/evidence_guide.md` - credibility_score 算法 + 何时信 / 不信
+- `references/opentitan_examples.md` - OpenTitan 6 模块的 driver dump 实例
+- `references/limitations.md` - 已知不支持的 SV 特性 + 失败模式
 
 ## Examples (可直接 copy 跑)
 
-- `examples/single_file_trace.py` — 最小单文件 trace
-- `examples/multi_file_hierarchical.py` — 3 文件 / 3 层 instance
-- `examples/multi_driver_check.py` — 多驱动检测 + dump
-- `examples/llm_context_pipeline.py` — trace → ContextBundle → 喂 LLM 模板
+- `examples/single_file_trace.py` - 最小单文件 trace
+- `examples/multi_file_hierarchical.py` - 3 文件 / 3 层 instance
+- `examples/multi_driver_check.py` - 多驱动检测 + dump
+- `examples/llm_context_pipeline.py` - trace → ContextBundle → 喂 LLM 模板
 
 ## Scripts (可独立 run)
 
-- `scripts/trace_one.py <file.sv> <signal>` — CLI: 跑 trace 输出 JSON
-- `scripts/audit_multi_drivers.py <dir>` — 目录: 扫所有 .sv 的多驱动
-- `scripts/dump_chain.py <file.sv> <signal> --depth 5` — 递归 dump driver 链
+- `scripts/trace_one.py <file.sv> <signal>` - CLI: 跑 trace 输出 JSON
+- `scripts/audit_multi_drivers.py <dir>` - 目录: 扫所有 .sv 的多驱动
+- `scripts/dump_chain.py <file.sv> <signal> --depth 5` - 递归 dump driver 链
