@@ -1,0 +1,40 @@
+{
+  "name": "lyric-writer",
+  "description": "中文歌词创作助手 (多风格版) - 10 种风格, 渐进式披露",
+  "version": "2.0.0",
+  "trigger": [
+    "写歌词",
+    "帮我写歌词",
+    "歌词创作",
+    "lyric",
+    "lyrics",
+    "分析歌词",
+    "这个歌词怎么样",
+    "按古风写",
+    "按流行写",
+    "按R&B写",
+    "按民谣写",
+    "按摇滚写"
+  ],
+  "entry": "SKILL.md",
+  "author": "fundou",
+  "tags": ["lyric", "writing", "creative", "chinese", "multi-style"],
+  "styles_supported": [
+    "gufeng (古风, 完整)",
+    "pop (流行, 占位符)",
+    "folk (民谣, 占位符)",
+    "rock (摇滚, 占位符)",
+    "rnb-soul (R&B/灵魂, 占位符)",
+    "hip-hop (说唱, 占位符)",
+    "urban-folk (城市民谣, 占位符)",
+    "campus-folk (校园民谣, 占位符)",
+    "edm (电子, 占位符)",
+    "chinese-style (中国风, 占位符)"
+  ],
+  "examples": [
+    "帮我写一首关于'灯'的歌词, 主题是放下执念",
+    "按 R&B 风格写一首分手歌",
+    "分析这段歌词: 流云消, 城门睡倒",
+    "用'潮'意象写古风歌词"
+  ]
+}
