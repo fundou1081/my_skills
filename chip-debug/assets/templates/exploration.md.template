@@ -1,0 +1,62 @@
+# Exploration Log — {{SESSION_ID}}
+
+A human-readable record of every branch tried and every hypothesis rejected.
+Source of truth is `2_decisions/decision_log.json`; this file mirrors it for
+human review.
+
+---
+
+## Branch / Hypothesis Index
+
+{{#BRANCHES}}
+### {{BRANCH_ID}} — {{TITLE}}  *(verdict: {{VERDICT}}, tag: {{TAG}})*
+
+- **Status**: {{STATUS}}
+- **Hypothesis**: {{HYPOTHESIS}}
+- **Evidence at time**: {{EVIDENCE_REF}}
+- **Reason**: {{REASON}}
+- **Date**: {{DATE}}
+
+{{/BRANCHES}}
+
+---
+
+## Search Strategy Used
+
+> Which strategy (DFS / BFS / hybrid), scoring rationale, and any pivots.
+
+{{STRATEGY_NOTES}}
+
+---
+
+## Branches Tied Off Without Closure
+
+> If a hypothesis was deferred for later, document the trigger condition that
+> should re-open it.
+
+{{DEFERRED_NOTES}}
+
+---
+
+## Counter-Examples Considered
+
+{{COUNTER_EXAMPLE_NOTES}}
+
+---
+
+## Tooling Notes
+
+> What tools were called, with raw outputs archived at `1_evidence/signal_snapshots/`.
+
+{{TOOLING_NOTES}}
+
+---
+
+## Cross-Session Handoff (if resuming)
+
+> State the current stage and last completed layer explicitly.
+
+- **Current stage**: {{CURRENT_STAGE}}
+- **Last completed layer / hop**: {{LAST_LAYER}}
+- **Open RC candidate**: {{OPEN_RC}}
+- **Outstanding gaps**: {{GAPS}}

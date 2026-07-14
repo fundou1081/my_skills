@@ -1,0 +1,48 @@
+# RC File — Reproducible Root-Cause Recipe
+# Save as `9_output/RC_file.yaml` for the RCA session.
+
+session_id:        {{SESSION_ID}}
+locked_entry:
+  time:            "{{LOCK_TIME}}"
+  signal:          "{{LOCK_PATH}}"
+  actual:          "{{LOCK_ACTUAL}}"
+  expected:        "{{LOCK_EXPECTED}}"
+  source:          "{{LOCK_SOURCE}}"
+
+# All signals participating in the chain, with current observed values
+# AND the value they SHOULD take after the root cause is removed.
+signals:
+{{#SIGNALS}}
+  - path:            "{{PATH}}"
+    in_chain_as:     "{{NODE_ID}}"
+    role:            "{{ROLE}}"  # symptom / driver / mux_select / addr / data / reset / ...
+    observed_value:  "{{OBSERVED}}"
+    expected_value:  "{{EXPECTED}}"
+    source_pointer:  "{{SOURCE}}"
+{{/SIGNALS}}
+
+# Constraints / expressions that govern the chain. Used to reproduce
+# the issue by random / directed runs.
+constraints:
+{{#CONSTRAINTS}}
+  - file:    "{{FILE}}"
+    line:    {{LINE}}
+    snippet: |
+      {{SNIPPET_INDENT}}>{{SNIPPET}}
+{{/CONSTRAINTS}}
+
+# Reproducer recipe — the minimum steps to demonstrate the RC.
+reproducer:
+  seeds:
+    - {{SEEDS}}
+  sequence: |
+    {{REPRO_STEPS}}
+  expected_outcome: "{{EXPECTED_OUTCOME_WHEN_PRESENT}}"
+  remove_root_cause: "{{EXPECTED_OUTCOME_WHEN_REMOVED}}"
+
+# Toggle test record (filled at Stage 4)
+toggle_test:
+  ran:              false  # set true once complete
+  inject_result:    null   # "reproduced" or descriptive result
+  remove_result:    null
+  iterations:       0

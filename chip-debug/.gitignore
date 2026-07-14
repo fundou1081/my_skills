@@ -1,0 +1,3 @@
+# Python caches (currently none generated; included for future)
+__pycache__/
+*.pyc

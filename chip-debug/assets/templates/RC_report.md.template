@@ -1,0 +1,149 @@
+# Root Cause Report — {{SESSION_ID}}
+
+**Date**: {{DATE}}
+**Author**: {{AUTHOR}}
+**Module / Project**: {{MODULE_OR_PROJECT}}
+**Severity**: {{SEVERITY}}    *(S0=blocks CI, S1=wrong data, S2=rare miscompare, S3=cosmetic)*
+**Reference run / log**: {{LOG_REFERENCE}}
+
+---
+
+## 1. Symptom Summary
+
+> One-paragraph description of what the user observed, with the locked-error
+> timestamp + path filled in.
+
+- **Locked time**: `{{LOCK_TIME}}`
+- **Locked signal**: `{{LOCK_PATH}}`
+- **Observed value**: `{{LOCK_ACTUAL}}`
+- **Expected value**: `{{LOCK_EXPECTED}}`
+
+## 2. Causal Chain
+
+> Diagram of nodes from RC → E0. Use one line per hop with the source pointer
+> and confidence value.
+
+```
+{{#NODES}}
+[{{NODE_ID}}] layer={{LAYER}} {{RELATION_LABEL}}
+   signal: {{SIGNAL}}
+   value : {{ACTUAL}}  (expected: {{EXPECTED}})
+   source: {{SOURCE}}
+{{/NODES}}
+```
+
+## 3. Per-hop Evidence
+
+> For each node, the full evidence — paste relevant wave/log/SVA excerpts and
+> the inference rule used.
+
+{{#NODES_DETAILED}}
+### {{NODE_ID}} — {{HOP}}
+
+- **Stage**: {{STAGE}}
+- **Time**: {{TIME}}
+- **Signal**: {{SIGNAL}}
+- **Actual / Expected**: `{{ACTUAL}}` / `{{EXPECTED}}`
+- **Source**: `{{SOURCE}}`
+- **Evidence kind**: {{EVIDENCE_KIND}}
+- **Relation**: {{RELATION}}
+- **Confidence**: {{CONFIDENCE}}
+- **Note**: {{NOTE}}
+
+> _paste raw excerpt here_
+
+{{/NODES_DETAILED}}
+
+## 4. Falsification Evidence
+
+### 4.1 Toggle test
+
+- **Inject**: {{INJECT_STEP}}
+- **Inject result**: {{INJECT_RESULT}}
+- **Remove**: {{REMOVE_STEP}}
+- **Remove result**: {{REMOVE_RESULT}}
+
+### 4.2 Counter-example search
+
+{{COUNTER_EXAMPLE_NOTES}}
+
+### 4.3 Secondary anomaly coverage
+
+| Anomaly                                          | Explained by which hop |
+|--------------------------------------------------|------------------------|
+| {{SECONDARY_ANOMALY}}                            | {{HOP}}                |
+
+## 5. Suggested Fix
+
+> Minimal, principled change. Don't include cosmetic refactors.
+
+{{FIX_DESCRIPTION}}
+
+```diff
+--- a/{{FILE}}
++++ b/{{FILE}}
+@@ -{{LINE}},{{COUNT}} +{{LINE}},{{COUNT}} @@
+{{DIFF}}
+```
+
+## 6. Self-Check Confirmation
+
+Tick once complete:
+
+- [ ] Simplest possible 100% reproduction steps exist
+- [ ] Causal chain has no logical jumps
+- [ ] All secondary anomalies disappear after fix
+- [ ] Reverting the fix re-introduces the symptom
+- [ ] Fix is stable across compile-flag / timing / layout variations
+- [ ] No other independent suspect explains all phenomena equally
+- [ ] Peer-reviewed and logic accepted
+
+## 7. Appendix — Artifacts
+
+- `1_evidence/evidence_chain.json`
+- `2_decisions/decision_log.json`
+- `3_repro/` — toggle-test reproducers
+- Signal snapshots at `1_evidence/signal_snapshots/`
+
+## 8. Root Cause Elevation (optional but recommended)
+
+> Optional. See [`references/root-cause-elevation.md`](../references/root-cause-elevation.md).
+> When filled in, this section elevates the concrete RC into higher-order categories —
+> design / architecture / style / generalization — to surface the class-level root.
+
+### 8.1 Design
+
+- **Spec gap (if any)**: ...
+- **Intent post-fix (clear / unclear)**: ...
+
+### 8.2 Architecture
+
+- **RC is local to this module?**: yes / no
+- **Monitor / supervision missed at**: ...
+- **Architectural proposal**: ...
+
+### 8.3 Style / Convention
+
+- **Bug class (used for lint rule)**: ...
+- **Lint / style rule (kind + pattern + tool)**: ...
+- **Review checklist / playbook addition**: ...
+
+### 8.4 Generalization
+
+- **Fingerprint (regex / pattern)**: ...
+- **Audit plan / output path**: ...
+- **Cross-component suspect list**: ...
+
+### 8.5 Elevation decision
+
+- **Elevation done by**: ...
+- **Date**: ...
+- **Follow-up owner / due**: ...
+
+## TL;DR
+
+- **Symptoms**: {{TLDR_SYMPTOMS}}
+- **Hop(s) of interest**: {{TLDR_HOPS}}
+- **RC**: {{TLDR_RC}}
+- **Fix**: {{TLDR_FIX}}
+- **Elevation (if any)**: {{TLDR_ELEVATION}}
